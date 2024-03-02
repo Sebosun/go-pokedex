@@ -6,53 +6,32 @@ import (
 	"os"
 )
 
-var cliName = "cli"
+var cliName = "Pokedex"
 
-func printPrompt() {
-	fmt.Print(cliName, "> ")
+type Config struct {
+	prev string
+	next string
 }
 
-type cliCommand struct {
-	name        string
-	description string
-	callback    func() error
+type ModifConfig interface {
+	UpdatePrev(string)
+	UpdateNext(string)
 }
 
-func getCommands() map[string]cliCommand {
-	return map[string]cliCommand{
-		"help": {
-			name:        "help",
-			description: "Displays a help message",
-			callback:    commandHelp,
-		},
-		"exit": {
-			name:        "exit",
-			description: "Exit the Pokedex",
-			callback:    commandExit,
-		},
-	}
+func (c *Config) UpdateNext(next string) {
+	c.next = next
 }
 
-func commandHelp() error {
-	fmt.Println("List of commands: ")
-
-	commands := getCommands()
-
-	for _, command := range commands {
-		fmt.Printf("%s: %s\n", command.name, command.description)
-	}
-
-	return nil
-}
-
-func commandExit() error {
-	fmt.Println("Goodbye!")
-	os.Exit(0)
-	return nil
+func (c *Config) UpdatePrev(prev string) {
+	c.prev = prev
 }
 
 func main() {
 	reader := bufio.NewScanner(os.Stdin)
+	config := Config{
+		prev: "",
+		next: "https://pokeapi.co/api/v2/location-area",
+	}
 
 	for {
 		printPrompt()
@@ -67,7 +46,10 @@ func main() {
 			continue
 		}
 
-		val.callback()
+		err := val.callback(&config)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 
 }
