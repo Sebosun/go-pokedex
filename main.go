@@ -9,8 +9,9 @@ import (
 var cliName = "Pokedex"
 
 type Config struct {
-	prev string
-	next string
+	cache mapCache
+	prev  string
+	next  string
 }
 
 type ModifConfig interface {
@@ -29,8 +30,9 @@ func (c *Config) UpdatePrev(prev string) {
 func main() {
 	reader := bufio.NewScanner(os.Stdin)
 	config := Config{
-		prev: "",
-		next: "https://pokeapi.co/api/v2/location-area",
+		cache: constructCache(),
+		prev:  "",
+		next:  "https://pokeapi.co/api/v2/location-area",
 	}
 
 	for {

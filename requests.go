@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 )
@@ -13,48 +12,31 @@ const (
 	directionPrev = "prev"
 )
 
-type PokeApiMap struct {
-	Count    int       `json:"count"`
-	Next     string    `json:"next"`
-	Previous any       `json:"previous"`
-	Results  []Results `json:"results"`
-}
-type Results struct {
-	Name string `json:"name"`
-	URL  string `json:"url"`
-}
+func updateMap(config *Config, pokeMap PokeApiMap) {
+	config.UpdateNext(pokeMap.Next)
 
-func printMaps(pokeMaps PokeApiMap) {
-	for _, key := range pokeMaps.Results {
-		fmt.Println(key.Name)
+	switch v := pokeMap.Previous.(type) {
+	case string:
+		config.UpdatePrev(v)
+	default:
+		config.UpdatePrev("")
 	}
 }
 
 func mapForward(config *Config) error {
-	conf := *config
-	pokeMap, err := handleMapRequest(conf, directionNext)
+	pokeMap, err := handleMapRequest(*config, directionNext)
 
 	if err != nil {
 		return err
 	}
 
 	printMaps(pokeMap)
-	conf.UpdateNext(pokeMap.Next)
-
-	switch v := pokeMap.Previous.(type) {
-	case string:
-		conf.UpdatePrev(v)
-	default:
-		conf.UpdatePrev("")
-	}
-
-	*config = conf
+	updateMap(config, pokeMap)
 
 	return nil
 }
 
 func mapBackwards(config *Config) error {
-	conf := *config
 	pokeMap, err := handleMapRequest(*config, directionPrev)
 
 	if err != nil {
@@ -62,17 +44,8 @@ func mapBackwards(config *Config) error {
 	}
 
 	printMaps(pokeMap)
-	conf.UpdateNext(pokeMap.Next)
-	switch v := pokeMap.Previous.(type) {
-	case string:
-		conf.UpdatePrev(v)
-	default:
-		conf.UpdatePrev("")
-	}
-
-	*config = conf
-
-	return err
+	updateMap(config, pokeMap)
+	return nil
 }
 
 func handleMapRequest(config Config, requestType string) (PokeApiMap, error) {
@@ -85,6 +58,16 @@ func handleMapRequest(config Config, requestType string) (PokeApiMap, error) {
 
 	if url == "" {
 		return PokeApiMap{}, errors.New("Invalid URL, Prev or Next missing")
+	}
+
+	val, getOk := config.cache.Get(url)
+	if getOk {
+		data := PokeApiMap{}
+		err := json.Unmarshal(val, &data)
+		if err != nil {
+			return PokeApiMap{}, errors.New("Unmarshaling failed")
+		}
+		return data, nil
 	}
 
 	res, ok := http.Get(url)
@@ -104,6 +87,6 @@ func handleMapRequest(config Config, requestType string) (PokeApiMap, error) {
 	if err != nil {
 		return PokeApiMap{}, errors.New("Unmarshaling failed")
 	}
-
+	config.cache.Add(url, body)
 	return data, nil
 }
