@@ -44,9 +44,30 @@ func (c *mapCache) Get(key string) ([]byte, bool) {
 	return v.val, true
 }
 
-func constructCache() mapCache {
-	return mapCache{
+func (c *mapCache) reapLoop(interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	for range ticker.C {
+		c.reap(time.Now().UTC(), interval)
+	}
+}
+
+func (c *mapCache) reap(now time.Time, last time.Duration) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	for k, v := range c.entries {
+		if v.createdAt.Before(now.Add(-last)) {
+			delete(c.entries, k)
+		}
+	}
+}
+
+func constructCache(interval time.Duration) mapCache {
+	cache := mapCache{
 		entries: make(map[string]cacheEntry),
 		mu:      &sync.Mutex{},
 	}
+
+	go cache.reapLoop(interval)
+
+	return cache
 }

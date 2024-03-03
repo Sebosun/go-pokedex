@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"time"
 )
 
 var cliName = "Pokedex"
@@ -30,7 +31,7 @@ func (c *Config) UpdatePrev(prev string) {
 func main() {
 	reader := bufio.NewScanner(os.Stdin)
 	config := Config{
-		cache: constructCache(),
+		cache: constructCache(time.Second * 10),
 		prev:  "",
 		next:  "https://pokeapi.co/api/v2/location-area",
 	}
