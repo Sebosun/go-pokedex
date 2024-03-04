@@ -33,6 +33,17 @@ func commandExplore(config *Config, input []string) error {
 	}
 	defer res.Body.Close()
 
+	val, getOk := config.cache.Get(url)
+	if getOk {
+		data := ExploreReturnType{}
+		err := json.Unmarshal(val, &data)
+		if err != nil {
+			return errors.New("Unmarshaling failed")
+		}
+		printExplore(data)
+		return nil
+	}
+
 	body, ok := io.ReadAll(res.Body)
 	if ok != nil {
 		return errors.New("Body parsing failed")
@@ -45,7 +56,7 @@ func commandExplore(config *Config, input []string) error {
 		return errors.New("Unmarshaling failed")
 	}
 
+	config.cache.Add(url, body)
 	printExplore(data)
-
 	return nil
 }
