@@ -13,3 +13,15 @@ func printMaps(pokeMaps PokeApiMap) {
 		fmt.Println(key.Name)
 	}
 }
+
+func commandPrintList(_ *Config, _ []string) error {
+	fmt.Println("List of commands: ")
+
+	commands := getCommands()
+
+	for _, command := range commands {
+		fmt.Printf("%s: %s\n", command.name, command.description)
+	}
+
+	return nil
+}

@@ -23,7 +23,7 @@ func updateMap(config *Config, pokeMap PokeApiMap) {
 	}
 }
 
-func mapForward(config *Config) error {
+func commandMapForwards(config *Config, input []string) error {
 	pokeMap, err := handleMapRequest(*config, directionNext)
 
 	if err != nil {
@@ -36,7 +36,7 @@ func mapForward(config *Config) error {
 	return nil
 }
 
-func mapBackwards(config *Config) error {
+func commandMapBackwards(config *Config, input []string) error {
 	pokeMap, err := handleMapRequest(*config, directionPrev)
 
 	if err != nil {
@@ -87,6 +87,6 @@ func handleMapRequest(config Config, requestType string) (PokeApiMap, error) {
 	if err != nil {
 		return PokeApiMap{}, errors.New("Unmarshaling failed")
 	}
-	config.cache.Add(url, body)
+
 	return data, nil
 }

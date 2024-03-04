@@ -3,10 +3,6 @@ package main
 import "strings"
 
 func parseInput(input string) []string {
-	dupa := strings.Split(input, " ")
-
-	return dupa
-
+	input = strings.TrimSpace(input)
+	return strings.Split(input, " ")
 }
-
-parseInput("explore dupa")

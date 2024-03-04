@@ -8,7 +8,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*Config) error
+	callback    func(*Config, []string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -16,7 +16,7 @@ func getCommands() map[string]cliCommand {
 		"help": {
 			name:        "help",
 			description: "Displays a help message",
-			callback:    commandHelp,
+			callback:    commandPrintList,
 		},
 		"exit": {
 			name:        "exit",
@@ -26,29 +26,22 @@ func getCommands() map[string]cliCommand {
 		"map": {
 			name:        "map",
 			description: "Go forward in a map",
-			callback:    mapForward,
+			callback:    commandMapForwards,
 		},
 		"mapb": {
 			name:        "mapb",
 			description: "Go backwards in a map",
-			callback:    mapBackwards,
+			callback:    commandMapBackwards,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Explore a map",
+			callback:    commandExplore,
 		},
 	}
 }
 
-func commandHelp(config *Config) error {
-	fmt.Println("List of commands: ")
-
-	commands := getCommands()
-
-	for _, command := range commands {
-		fmt.Printf("%s: %s\n", command.name, command.description)
-	}
-
-	return nil
-}
-
-func commandExit(config *Config) error {
+func commandExit(_ *Config, _ []string) error {
 	fmt.Println("Goodbye!")
 	os.Exit(0)
 	return nil
