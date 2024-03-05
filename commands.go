@@ -45,8 +45,13 @@ func getCommands() map[string]cliCommand {
 		},
 		"inspect": {
 			name:        "inspect",
-			description: "Show caught pokemons",
+			description: "Show details of caught pokemon",
 			callback:    commandInspect,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "Show caught pokemons",
+			callback:    commandPokedex,
 		},
 	}
 }
@@ -54,5 +59,25 @@ func getCommands() map[string]cliCommand {
 func commandExit(_ *Config, _ []string) error {
 	fmt.Println("Goodbye!")
 	os.Exit(0)
+	return nil
+}
+
+func printPokedex(pokedex Pokedex) {
+	fmt.Println("Your Pokedex: ")
+	for k := range pokedex.entries {
+		pokemon, ok := pokedex.entries[k]
+		if ok {
+			fmt.Println(" -", pokemon.Name)
+		}
+	}
+}
+
+func commandPokedex(config *Config, _ []string) error {
+	if config.pokedex.Len() > 0 {
+		printPokedex(config.pokedex)
+		return nil
+
+	}
+	fmt.Println("Your pokedex is empty")
 	return nil
 }

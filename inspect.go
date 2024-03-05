@@ -13,9 +13,16 @@ func commandInspect(config *Config, input []string) error {
 	val, ok := config.pokedex.Get(input[1])
 
 	if !ok {
-		errors.New("You haven't caught this pokemon or pokemon doesn't exist!")
+		return errors.New("You haven't caught this pokemon or pokemon doesn't exist!")
 	}
 
-	fmt.Println("You have ", val.Name)
+	fmt.Println("Name:", val.Name)
+	fmt.Println("Height:", val.Height)
+	fmt.Println("Height:", val.Weight)
+
+	for _, stat := range val.Stats {
+		fmt.Println("  -"+stat.Stat.Name+": ", stat.BaseStat)
+	}
+
 	return nil
 }

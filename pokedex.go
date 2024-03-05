@@ -32,6 +32,17 @@ func (c *Pokedex) Get(key string) (Pokemon, bool) {
 	return v, true
 }
 
+func (c *Pokedex) Len() int {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	count := 0
+	for range c.entries {
+		count++
+	}
+
+	return count
+}
+
 func constructPokedex() Pokedex {
 	pokedex := Pokedex{
 		entries: make(map[string]Pokemon),

@@ -15,8 +15,6 @@ func catchPokemon(baseExp int) bool {
 	chanceBase := int32(baseExp / 2)
 	randomNum := rand.Int31n(int32(float64(baseExp) * 0.9))
 
-	fmt.Println("Chance to catch pikachu", chanceBase)
-	fmt.Println("Random num", randomNum)
 	if randomNum > chanceBase {
 		return true
 	}
