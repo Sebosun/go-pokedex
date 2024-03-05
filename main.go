@@ -14,6 +14,7 @@ type Config struct {
 	baseURL string
 	prev    string
 	next    string
+	pokedex Pokedex
 }
 
 type ModifConfig interface {
@@ -36,6 +37,7 @@ func main() {
 		baseURL: "https://pokeapi.co/api/v2/",
 		prev:    "",
 		next:    "https://pokeapi.co/api/v2/location-area",
+		pokedex: constructPokedex(),
 	}
 
 	for {
